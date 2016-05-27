@@ -1,15 +1,17 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 public class Main
 {
 	public static void main (String[] args)
 	{
-		byte    size    = 0;
 		JFrame  frame   = new JFrame("Simplex");
 
 		frame.setSize(200,150);
+		frame.setMinimumSize(new Dimension(200,150));
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -41,21 +43,27 @@ public class Main
 		frame.getContentPane().add(panel);
 		frame.setVisible(true);
 
-		while(size < 2)
-			if(jtFtS.getString().matches("\\d+"))
-				size = (new Scanner(jtFtS.getString())).nextByte();
+		while(jtFtS.result < 2)
+		{
+			try
+			{
+				TimeUnit.NANOSECONDS.sleep(1);
+			}
+			catch (InterruptedException e) {}
+		};
 
-		String Titles[] = new String[size * 2 - 1];
+		String Titles[] = new String[jtFtS.result * 2 - 1];
 		for (byte i = 0; i < Titles.length; ++i)
 			if (i == 0)
 				Titles[i] = "Y";
-			else if (i < size)
+			else if (i < jtFtS.result)
 				Titles[i] = "x" + i;
 			else
-				Titles[i] = "s" + (i - size +1);
+				Titles[i] = "s" + (i - jtFtS.result +1);
 
 		frame.getContentPane().removeAll();
 		frame.setSize(800,600);
 		frame.setLocationRelativeTo(null);
+		while (true);
 	}
 }
