@@ -2,10 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Thread.sleep;
-
 public class Main
 {
+
+	private JTFtS JTFtS1;
+
 	public static void main (String[] args)
 	{
 		JFrame  frame   = new JFrame("Simplex");
@@ -50,7 +51,7 @@ public class Main
 				TimeUnit.NANOSECONDS.sleep(1);
 			}
 			catch (InterruptedException e) {}
-		};
+		}
 
 		String Titles[] = new String[jtFtS.result * 2 - 1];
 		for (byte i = 0; i < Titles.length; ++i)
@@ -61,9 +62,17 @@ public class Main
 			else
 				Titles[i] = "s" + (i - jtFtS.result +1);
 
+		SmplxTbl smplxTbl = new SmplxTbl(jtFtS.result);
+		JTable table = new JTable(smplxTbl.table, Titles);
+		JScrollPane scrollPane = new JScrollPane(table);
+
+		frame.setVisible(false);
 		frame.getContentPane().removeAll();
 		frame.setSize(800,600);
+		frame.setMaximumSize(new Dimension(1366,768));
 		frame.setLocationRelativeTo(null);
+		frame.getContentPane().add(scrollPane);
+		frame.setVisible(true);
 		while (true);
 	}
 }

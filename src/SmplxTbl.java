@@ -3,7 +3,7 @@
  */
 public class SmplxTbl
 {
-	private Object[][] table;   //The Simplex Tableau.
+	public Object[][] table;   //The Simplex Tableau.
 
 	/**
 	 * Constructor for a "naked" tableau.
@@ -30,11 +30,13 @@ public class SmplxTbl
 	public SmplxTbl (byte size)
 	{
 		table = new Fraction[size][];
+
 		for (byte i = 0; i < table.length; ++i)
 		{
 			table[i] = new Fraction[size * 2 - 1];
+
 			for (byte j = 0; j < table[i].length; ++j)
-				table[i][j] = new Fraction(1L);
+				table[i][j] = new Fraction();
 		}
 	}
 
@@ -61,45 +63,67 @@ public class SmplxTbl
 	{
 		if(col >= (table[row].length + 1) / 2)
 			throw new ArrayIndexOutOfBoundsException("Can't perform operation on slack variables/results.");
-		Fraction tmp = (Fraction) (table[row][col]);
+
+		Fraction tmp = (Fraction) table[row][col];
+
 		for(byte i = 0; i < table[row].length; ++i)
-			((Fraction) (table[row][i])).divide(tmp);
+			((Fraction) table[row][i]).divide(tmp);
+
 		for(byte i = 0; i < table.length; ++i)
 			if(i != row)
 			{
-				tmp = new Fraction (((Fraction) (table[i][col])).divide((Fraction) (table[row][col])));
+				tmp = new Fraction ((Fraction) table[i][col]);
+				((Fraction) table[i][col]).divide(tmp);
+
 				for (byte j = 0; j < table[i].length; ++j)
-					((Fraction) (table[i][j])).divide(tmp);
+					((Fraction) table[i][j]).divide(tmp);
 			}
 	}
 
 	/**
 	 * Performs the pivot operations and finds the best candidate.
-	 * TODO: finish.
 	 * @param col column of the pivot.
+	 * @return The index of the optimal pivot row.
 	 * @throws ArrayIndexOutOfBoundsException when col is out of bounds.
 	 */
-	public void perform (byte col) throws ArrayIndexOutOfBoundsException
+	public byte perform (byte col) throws ArrayIndexOutOfBoundsException
 	{
 		if(col >= (table[0].length + 1) / 2)
 			throw new ArrayIndexOutOfBoundsException("Can't perform operation on slack variables/results.");
-		byte        idx;
-		Fraction    tmpF;
+
+		byte        resB = 0;
+		Fraction    resF = new Fraction(),
+					maxF = new Fraction(),
+					tmpF;
 		Object[][][]tmpO = new Object[table.length][][];
+
 		for(byte i = 1; i < table.length; ++i)
 		{
 			tmpO[i] = table;
 			tmpF = new Fraction((Fraction) (table[i][col]));
+
 			for (byte j = 0; j < tmpO[i][i].length; ++j)
-				((Fraction) (tmpO[i][i][j])).divide(tmpF);
+				((Fraction) tmpO[i][i][j]).divide(tmpF);
+
 			for (byte j = 0; j < table[i].length; ++j)
 				if (j != i)
 				{
-					tmpF = new Fraction(((Fraction) (tmpO[i][j][col])).divide((Fraction) (tmpO[i][j][col])));
+					tmpF = new Fraction ((Fraction) tmpO[i][j][col]);
+
+					if(maxF.compareTo(((Fraction) tmpO[i][j][col]).divide(tmpF)) < 0)
+						maxF = (Fraction) tmpO[i][j][col];
+
 					for (byte k = 0; k < tmpO[i][j].length; ++k)
-						((Fraction) (tmpO[i][j][k])).divide(tmpF);
+						((Fraction) tmpO[i][j][k]).divide(tmpF);
 				}
+
+			if(resF.compareTo(maxF) < 0)
+			{
+				resF = maxF;
+				resB = i;
+			}
 		}
+		table = tmpO[resB];
+		return resB;
 	}
-	//TODO: finish.
 }

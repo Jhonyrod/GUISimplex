@@ -1,11 +1,7 @@
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.AbstractDocument;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * JTFtS JTextField to String class, provides a way to retrieve a string from a JTextField once enter is pressed.

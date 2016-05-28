@@ -3,38 +3,10 @@ import java.util.*;
 /**
  * Fraction implements a way to work with mathematical fractions.
  */
-class Fraction
+class Fraction implements Comparable<Fraction>
 {
 	private long    num,        //The numerator of the fraction.
 					den = 1;    //The denominator, defaulted to 1.
-
-	/**
-	 * Helper method to simplify().
-	 * @param param The number to be factorized.
-	 * @return      An array of pairs; each holding one factor and the number of times that factor divided param.
-	 *              The factor is held in Key and its count in Value.
-	 */
-	public static ArrayList<AbstractMap.SimpleEntry<Long, Byte>> factorize (final long param)
-	{
-		long n = param;
-		ArrayList<AbstractMap.SimpleEntry<Long, Byte>> res = new ArrayList<>();
-		for(long i = 2; i <= n / i; ++i)
-		{
-			if(n % i == 0)
-			{
-				if(!res.isEmpty() || (res.get(res.size() - 1).getKey() != i))
-					res.add(new AbstractMap.SimpleEntry<>(i, (byte)1));
-				else
-					res.get(res.size() - 1).setValue((byte) (res.get(res.size() - 1).getValue() + 1));
-				n /= i;
-			}
-		}
-		if(n > 1)
-		{
-			res.add(new AbstractMap.SimpleEntry<>(n, (byte)1));
-		}
-		return res;
-	}
 
 	/**
 	 * Simplifies this Fraction
@@ -43,34 +15,28 @@ class Fraction
 	 */
 	private void simplify ()
 	{
-		if ((num % den) == 0)
+		long    A = num,
+				B = den;
+
+		for(long C; B != 0; A = C)
 		{
-			num /= den;
-			den /= den;
-			return;
+			C = B;
+			B = A % B;
 		}
-		ArrayList<AbstractMap.SimpleEntry<Long, Byte>>  numf = factorize(num),
-														denf = factorize(den);
-		for(AbstractMap.SimpleEntry<Long, Byte> i : numf)
-			for(AbstractMap.SimpleEntry<Long, Byte> j : denf)
-				if (Objects.equals(i.getValue(), j.getValue()))
-					for (long k = 0; k < ((i.getKey() > j.getKey()) ? j.getKey() : i.getKey()); ++k)
-					{
-						num/=i.getValue();
-						den/=j.getValue();
-					}
+
+		num /= A;
+		den /= A;
 	}
 
 	/**
-	 *
 	 * Constructor for a fraction of the form n/d.
 	 * @param n The new numerator
 	 * @param d The new denominator.
-	 * @throws  IllegalArgumentException when it tries to set the denominator to 0.
+	 * @throws IllegalArgumentException when it tries to set the denominator to 0.
 	 */
 	public Fraction (final long n, final long d) throws IllegalArgumentException
 	{
-		if(d == 0)
+		if (d == 0)
 			throw new IllegalArgumentException("Denominator can't be zero.");
 		else
 		{
@@ -93,13 +59,21 @@ class Fraction
 	}
 
 	/**
+	 * Void constructor, defaults to 0.
+	 */
+	public Fraction ()
+	{
+		num=0;
+	}
+
+	/**
 	 * Constructor for Strings
 	 * @param param A string of the form "numerator[separator]denominator", many separators are supported.
 	 * @throws IllegalArgumentException if param doesn't match the prototype.
 	 */
 	public Fraction (final String param) throws IllegalArgumentException
 	{
-		if(param.matches("[ \\t\\x0B]*-?[ \\t\\x0B]*\\d+[ \\t\\x0B]*[/|\\\\:;.,][ \\t\\x0B]*-?[ \\t\\x0B]*\\d+[ \\t\\x0B]*"))
+		if (param.matches("[ \\t\\x0B]*-?[ \\t\\x0B]*\\d+[ \\t\\x0B]*[/|\\\\:;.,][ \\t\\x0B]*-?[ \\t\\x0B]*\\d+[ \\t\\x0B]*"))
 		{
 			long tmp;
 			if (param.matches("[ \\t\\x0B]*-.*") ^ param.matches(".*[/|\\\\:;.,][ \\t\\x0B]*-.*[ \\t\\x0B]*"))
@@ -133,9 +107,9 @@ class Fraction
 	 * Method used when the decimal approximation of this Fraction is needed.
 	 * @return The decimal approximation of this Fraction.
 	 */
-	public double todouble ()
+	public double toDouble ()
 	{
-		return (double)num/(double)den;
+		return (double) num / (double) den;
 	}
 
 	public Fraction add (final Fraction other)
@@ -149,7 +123,7 @@ class Fraction
 	/**
 	 * Adds an integer.
 	 * @param param integer to add.
-	 * @return      the resulting Fraction.
+	 * @return the resulting Fraction.
 	 */
 	public Fraction add (final long param)
 	{
@@ -160,8 +134,8 @@ class Fraction
 	/**
 	 * Adds a String formatted Fraction.
 	 * @param param the Fraction in String format.
-	 * @return      the resulting Fraction.
-	 * @throws      IllegalArgumentException when param doesn't match the prototype.
+	 * @return the resulting Fraction.
+	 * @throws IllegalArgumentException when param doesn't match the prototype.
 	 */
 	public Fraction add (final String param) throws IllegalArgumentException
 	{
@@ -172,8 +146,8 @@ class Fraction
 	/**
 	 * Inverse of add.
 	 * @param other ditto.
-	 * @return      ditto.
-	 * @see         #add(Fraction).
+	 * @return ditto.
+	 * @see #add(Fraction).
 	 */
 	public Fraction subtract (final Fraction other)
 	{
@@ -186,8 +160,8 @@ class Fraction
 	/**
 	 * Inverse of add.
 	 * @param param ditto.
-	 * @return      ditto.
-	 * @see         #add(long).
+	 * @return ditto.
+	 * @see #add(long).
 	 */
 	public Fraction subtract (final long param)
 	{
@@ -198,9 +172,9 @@ class Fraction
 	/**
 	 * Inverse of add.
 	 * @param param ditto.
-	 * @return      ditto.
-	 * @throws      IllegalArgumentException ditto.
-	 * @see         #add(String).
+	 * @return ditto.
+	 * @throws IllegalArgumentException ditto.
+	 * @see #add(String).
 	 */
 	public Fraction subtract (final String param) throws IllegalArgumentException
 	{
@@ -211,8 +185,8 @@ class Fraction
 	/**
 	 * Repetitive add.
 	 * @param other ditto.
-	 * @return      ditto.
-	 * @see         #add(Fraction).
+	 * @return ditto.
+	 * @see #add(Fraction).
 	 */
 	public Fraction multiply (final Fraction other)
 	{
@@ -225,8 +199,8 @@ class Fraction
 	/**
 	 * Repetitive add.
 	 * @param param ditto.
-	 * @return      ditto.
-	 * @see         #add(long).
+	 * @return ditto.
+	 * @see #add(long).
 	 */
 	public Fraction multiply (final long param)
 	{
@@ -238,9 +212,9 @@ class Fraction
 	/**
 	 * Repetitive add.
 	 * @param param ditto.
-	 * @return      ditto.
-	 * @throws      IllegalArgumentException ditto.
-	 * @see         #add(String).
+	 * @return ditto.
+	 * @throws IllegalArgumentException ditto.
+	 * @see #add(String).
 	 */
 	public Fraction multiply (final String param) throws IllegalArgumentException
 	{
@@ -252,8 +226,8 @@ class Fraction
 	/**
 	 * Inverse of multiply.
 	 * @param other ditto.
-	 * @return      ditto.
-	 * @see         #add(Fraction).
+	 * @return ditto.
+	 * @see #add(Fraction).
 	 */
 	public Fraction divide (final Fraction other)
 	{
@@ -266,8 +240,8 @@ class Fraction
 	/**
 	 * Inverse of multiply.
 	 * @param param ditto.
-	 * @return      ditto.
-	 * @see         #add(long).
+	 * @return ditto.
+	 * @see #add(long).
 	 */
 	public Fraction divide (final long param)
 	{
@@ -279,9 +253,9 @@ class Fraction
 	/**
 	 * Inverse of multiply.
 	 * @param param ditto.
-	 * @return      ditto.
-	 * @throws      IllegalArgumentException ditto.
-	 * @see         #add(String).
+	 * @return ditto.
+	 * @throws IllegalArgumentException ditto.
+	 * @see #add(String).
 	 */
 	public Fraction divide (final String param) throws IllegalArgumentException
 	{
@@ -296,45 +270,30 @@ class Fraction
 	@Override
 	public String toString ()
 	{
-		if(den < -1 || den > 1)
-			if(num * den < 0)
+		if (den < -1 || den > 1)
+			if (num * den < 0)
 				return ((num < 0) ? num : -num) + "/" + ((den < 0) ? -den : den);
 			else
 				return ((num < 0) ? -num : num) + "/" + ((den < 0) ? -den : den);
+		else if (num * den < 0)
+			return ((num < 0) ? num : -num) + "";
 		else
-			if(num * den < 0)
-				return ((num < 0) ? num : -num)+"";
-			else
-				return ((num < 0) ? -num : num)+"";
+			return ((num < 0) ? -num : num) + "";
 	}
 
 	/**
-	 * Provides comparisons. Any other needed comparison can be made by combining these three methods and their negations.
-	 * @param other Fraction to compare to.
-	 * @return      result of the comparison.
+	 * Compares this object with the specified object for order.
+	 * Returns a negative integer, zero, or a positive integer as this object is
+	 * less than, equal to, or greater than the specified object.
+	 * @param o the object to be compared.
+	 * @return a negative integer, zero, or a positive integer as this object is
+	 * less than, equal to, or greater than the specified object.
+	 * @throws NullPointerException if the specified object is null
+	 * @throws ClassCastException   if the specified object's type prevents it from being compared to this object.
 	 */
-	public boolean isEqual (Fraction other)
+	@Override
+	public int compareTo (Fraction o)
 	{
-		return ((num == other.num) && (den == other.den));
-	}
-
-	/**
-	 * Provides comparisons. Any other needed comparison can be made by combining these three methods and their negations.
-	 * @param other Fraction to compare to.
-	 * @return      result of the comparison.
-	 */
-	public boolean isLess (Fraction other)
-	{
-		return ((num * other.den) < (den * other.num));
-	}
-
-	/**
-	 * Provides comparisons. Any other needed comparison can be made by combining these three methods and their negations.
-	 * @param other Fraction to compare to.
-	 * @return      result of the comparison.
-	 */
-	public boolean isGreater (Fraction other)
-	{
-		return ((num * other.den) > (den * other.num));
+		return (new Long(num * o.den)).compareTo(o.num * den);
 	}
 }
